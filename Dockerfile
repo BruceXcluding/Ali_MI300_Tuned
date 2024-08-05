@@ -46,7 +46,7 @@ ARG RCCL_TESTS_REPO=https://github.com/ROCm/rccl-tests
 ARG RCCL_TESTS_BRANCH=develop
 
 # ---------------------------------------------------------------------------------------------------------------
-FROM rocm_pytorch AS rocm_hipblaslt
+FROM rocm_pytorch AS rocm_rocblas
 # ROCBLAS BUILD 
 ARG GFX_COMPILATION_ARCH
 ARG ROCBLAS_REPO
