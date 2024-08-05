@@ -1,6 +1,6 @@
 # CONTEXT {'gpu_vendor': 'AMD', 'guest_os': 'UBUNTU'}
-ARG BASE_IMAGE="rocm/pytorch-private:exec_dashboard_nightly" AS rocm_pytorch
-FROM $BASE_DOCKER
+ARG BASE_IMAGE="rocm/pytorch-private:exec_dashboard_nightly" 
+FROM $BASE_IMAGE AS rocm_pytorch
 USER root
 RUN apt update
 RUN apt install -y rsync wget 
@@ -183,7 +183,7 @@ ENV PYTORCH_ROCM_ARCH=${PYTORCH_ROCM_ARCH}
 WORKDIR /rocm
 COPY . /rocm/
 
-RUN mkdir build
+# RUN mkdir build
 RUN for tar_file in rocm_*.tar; do tar -xvf $tar_file -C build ; done
 
 RUN python3.9 -m pip install build/*.whl
