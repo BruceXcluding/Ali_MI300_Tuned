@@ -21,7 +21,7 @@ RUN cd /usr/local && \
 ENV PATH=/usr/local/cmake-${CMAKE_VERSION}-linux-x86_64/bin:${PATH}
 
 # General build overrides
-ARG GFX_COMPILATION_ARCH="gfx942:xnack-"
+ARG GFX_COMPILATION_ARCH="gfx942"
 
 # Library overrides
 
