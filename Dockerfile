@@ -211,7 +211,7 @@ RUN python3 -m pip install --upgrade numba \
 RUN pip3 install pandas
 
 # Prefer HIPBlasLt path
-ENV TORCH_BLAS_PREFER_HIPBLASLT=1
+ENV TORCH_BLAS_PREFER_HIPBLASLT=0
 
 # Turn off numerical check for tunable ops
 ENV PYTORCH_TUNABLEOP_NUMERICAL_CHECK=0
