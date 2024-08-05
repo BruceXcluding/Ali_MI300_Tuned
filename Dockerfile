@@ -51,7 +51,7 @@ FROM rocm_pytorch AS rocm_hipblaslt
 ARG GFX_COMPILATION_ARCH
 ARG ROCBLAS_REPO
 ARG ROCBLAS_BRANCH
-WORKDIR /app
+WORKDIR /rocm
 
 
 # Fixing the error: 
@@ -82,7 +82,7 @@ FROM rocm_pytorch AS rocm_hipblaslt
 ARG GFX_COMPILATION_ARCH
 ARG HIPBLASLT_REPO
 ARG HIPBLASLT_BRANCH
-WORKDIR /app
+WORKDIR /rocm
 
 # Fixing the error: 
 # [ 87%] Linking CXX executable ../staging/rocblas-test
@@ -115,7 +115,7 @@ FROM rocm_pytorch AS rocm_triton
 ARG TRITON_REPO
 ARG TRITON_BRANCH
 COPY --from=rocm_pytorch / /
-WORKDIR /app
+WORKDIR /rocm
 
 RUN python3 -m pip install cmake ninja
 ## install Triton
@@ -136,7 +136,7 @@ ARG RCCL_REPO
 ARG RCCL_BRANCH
 ARG RCCL_TESTS_REPO
 ARG RCCL_TESTS_BRANCH
-WORKDIR /app
+WORKDIR /rocm
 
 RUN cp /opt/rocm/.info/version /opt/rocm/.info/version-dev
 RUN apt install rocm-cmake -y
@@ -162,12 +162,26 @@ COPY --from=rocm_rccl_tests /rocm/rccl-tests/build/*.deb /
 COPY --from=rocm_rccl_tests /rocm/rccl-tests/build/all_reduce_perf /
 
 # ---------------------------------------------------------------------------------------------------------------
+# install flash-attention as it doesn't like whl file installation.
+FROM rocm_pytorch AS rocm_flash_attention
+ARG GFX_COMPILATION_ARCH
+WORKDIR /rocm
+
+RUN python3 -m pip install cmake ninja
+## install FA
+RUN git clone https://github.com/ROCm/flash-attention flash-attention && cd flash-attention \
+  && git checkout ck_tile \
+  && git submodule update --init --recursive \
+  && GPU_ARCHS=gfx942 python3 setup.py install
+
+
+# ---------------------------------------------------------------------------------------------------------------
 # FINAL_USING_PREBUILT_COMPONENTS
 FROM rocm_pytorch AS final_using_prebuilt_components
 ARG PYTORCH_ROCM_ARCH="gfx942"
 ENV PYTORCH_ROCM_ARCH=${PYTORCH_ROCM_ARCH}
-WORKDIR /app
-COPY . /app/
+WORKDIR /rocm
+COPY . /rocm/
 
 RUN mkdir build
 RUN for tar_file in rocm_*.tar; do tar -xvf $tar_file -C build ; done
@@ -183,16 +197,8 @@ RUN bash -c "./fix_ignore_broken_dpkg_deps > dpkg_status.fix" \
 
 ENV RAY_EXPERIMENTAL_NOSET_ROCR_VISIBLE_DEVICES=1
 
-# install flash-attention as it doesn't like whl file installation.
-ARG GFX_COMPILATION_ARCH
-RUN python3 -m pip install cmake ninja
-## install FA
-RUN git clone https://github.com/ROCm/flash-attention flash-attention && cd flash-attention \
-  && git checkout ck_tile \
-  && git submodule update --init --recursive \
-  && GPU_ARCHS=gfx942 python3 setup.py install
-
 # install vllm and gradlib
+
 RUN python3 -m pip install --upgrade numba \
     && git clone https://github.com/ROCm/vllm.git \
 	  && cd vllm \
@@ -209,6 +215,7 @@ RUN python3 -m pip install --upgrade numba \
     && python3 setup.py install
 
 RUN pip3 install pandas
+
 
 # Prefer HIPBlasLt path
 ENV TORCH_BLAS_PREFER_HIPBLASLT=0
