@@ -1,3 +1,4 @@
 [submodule "pytorch_afo_testkit"]
 	path = pytorch_afo_testkit
-	url = https://github.com/ROCm/pytorch_afo_testkit.git
+	url = git@github.com:ROCm/pytorch_afo_testkit.git
+	commit = ab47c121148706923f18799f0a7561652498092d
