@@ -4,13 +4,13 @@ set -ex
 
 declare -a MODELS=("NousResearch/Llama-2-7b-chat-hf" "NousResearch/Llama-2-70b-hf" "NousResearch/Meta-Llama-3.1-8B" "NousResearch/Meta-Llama-3.1-70B" "Qwen/Qwen2-7B-Instruct" "Qwen/Qwen2-72B-Instruct" "Qwen/Qwen1.5-110B-Chat")
 
-ROOT_PATH=/workspace/
-# BENCHMARK_PATH=$ROOT_PATH"Ali_MI300_Tuned/Ali_PoC/throughput/benchmark_throughput.py"
-BENCHMARK_PATH=$ROOT_PATH"/vllm/benchmarks/benchmark_throughput.py"
+ROOT_PATH=$(dirname $(dirname "$PWD"))"/"
+BENCHMARK_PATH=$ROOT_PATH"Ali_MI300_Tuned/Ali_PoC/throughput/benchmark_throughput_0802_1717.py"
+# BENCHMARK_PATH=$ROOT_PATH"/vllm/benchmarks/benchmark_throughput.py"
 TEMP_FILE_PATH=$ROOT_PATH"PerfRes/"
 KIT_SOURCE_PATH=$ROOT_PATH"Ali_MI300_Tuned/pytorch_afo_testkit"
 GEMM_TUNE_PATH=$ROOT_PATH"Ali_MI300_Tuned/Gemm_Tune/"
-
+echo $BENCHMARK_PATH
 OUTPUT_LEN=500
 NUM_SEQ=1000
 INPUT_LEN="1000 2000"
