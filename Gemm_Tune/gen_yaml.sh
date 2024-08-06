@@ -35,8 +35,8 @@ for MODEL in ${MODELS[@]}; do
         if [ ! -d $KIT_PATH ]; then
             mkdir -p $KIT_PATH
         fi
-        if [ ! -d $GEMM_TUNE_PATH$CURRMODEL ]; then 
-            mkdir -p $GEMM_TUNE_PATH/$CURRMODEL
+        if [ ! -d $GEMM_TUNE_PATH/$CURRMODEL"-"$inp"inp" ]; then 
+            mkdir -p $GEMM_TUNE_PATH/$CURRMODEL-${inp}inp
         fi
         if [ ! -d $TEMP_FILE_PATH$CURRMODEL ]; then 
             mkdir -p $TEMP_FILE_PATH$CURRMODEL
@@ -55,6 +55,8 @@ for MODEL in ${MODELS[@]}; do
         echo "[LOG] yaml file: "$YAML_NAME
         ROCBLAS_LAYER=4 $RUN_SCRIPT 2>&1 |  grep "\- { rocblas_function:" | uniq | tee $YAML_NAME        
         
-        cp -r $YAML_NAME $GEMM_TUNE_PATH/$CURRMODEL
+        cp -r $YAML_NAME $GEMM_TUNE_PATH/$CURRMODEL-${inp}inp
+        cd $ROOT_PATH
+        rm -rf $ROOT_PATH$CURRMODEL/
     done
 done
