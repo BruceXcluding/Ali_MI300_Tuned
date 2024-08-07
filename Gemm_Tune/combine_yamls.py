@@ -4,7 +4,7 @@ import yaml
 csvs = []
 for r,d,f in os.walk("."):
     for name in f:
-        if name == "afo_tune_device_0_full.csv":
+        if name == "afo_tune_device_0_from_yaml.csv":
             print(f"{r}/{name}")
             csvs.append(f"{r}/{name}")
 
@@ -19,5 +19,5 @@ for csv in csvs:
                     combined_csv += line
 # Writeout combined files per device
 for device in range(8):
-    with open(f"afo_tune_device_{device}_full.csv", "w") as f:
+    with open(f"afo_tune_device_{device}_full.csv", "a+") as f:
         f.write(combined_csv)#

@@ -8,7 +8,7 @@ for d in */; do
     cd $d
     for f in *.yaml; do
 	echo "Tuning for $d/$f"
-	python $TUNE_PATH $f --cuda_device 0 1 2 3 4 5 6 7
+	HIP_VISIBLE_DEVICES=0,1,2,3 python $TUNE_PATH $f --cuda_device 0 1 2 3
     done
     cd ..
 done

@@ -1,0 +1,13 @@
+Validator,PT_VERSION,2.4.0
+Validator,ROCM_VERSION,6.1.0.0-82-5fabb4c
+Validator,HIPBLASLT_VERSION,0.7.0-1549b021
+Validator,GCN_ARCH_NAME,gfx942:sramecc+:xnack-
+Validator,ROCBLAS_VERSION,4.1.0-cefa4a9b-dirty
+GemmTunableOp_Half_TN,tn_28672_4000_8192,Gemm_Hipblaslt_TN_9936,3.33925
+GemmTunableOp_Half_TN,tn_8192_232_4096,Gemm_Hipblaslt_TN_9521,0.0426721
+GemmTunableOp_Half_TN,tn_8192_256_14336,Gemm_Hipblaslt_TN_9545,0.137452
+GemmTunableOp_Half_TN,tn_8192_256_4096,Gemm_Rocblas_621286493,0.0431331
+GemmTunableOp_Half_TN,tn_8192_4096_4096,Gemm_Rocblas_621286590,0.466237
+GemmTunableOp_Half_TN,tn_5120_256_8192,Gemm_Rocblas_621286764,0.0585727
+GemmTunableOp_Half_TN,tn_28672_232_8192,Gemm_Hipblaslt_TN_9540,0.289516
+GemmStridedBatchedTunableOp_Half_TN,tn_16_16_128_B_32,Default,0.00626175
