@@ -2,9 +2,8 @@
 
 set -ex
 
-# declare -a MODELS=("NousResearch/Llama-2-7b-chat-hf" "NousResearch/Llama-2-70b-hf" "NousResearch/Meta-Llama-3.1-8B" "NousResearch/Meta-Llama-3.1-70B" "Qwen/Qwen2-7B-Instruct" "Qwen/Qwen2-72B-Instruct" "Qwen/Qwen1.5-110B-Chat")
-declare -a MODELS=("NousResearch/Llama-2-70b-hf" "NousResearch/Meta-Llama-3.1-8B" "NousResearch/Meta-Llama-3.1-70B" "Qwen/Qwen2-72B-Instruct" "Qwen/Qwen1.5-110B-Chat")
-# declare -a MODELS=("Qwen/Qwen2-7B-Instruct")
+declare -a MODELS=("NousResearch/Llama-2-7b-chat-hf" "NousResearch/Llama-2-70b-hf" "NousResearch/Meta-Llama-3.1-8B" "NousResearch/Meta-Llama-3.1-70B" "Qwen/Qwen2-7B-Instruct" "Qwen/Qwen2-72B-Instruct" "Qwen/Qwen1.5-110B-Chat")
+# declare -a MODELS=("meta-llama/Meta-Llama-3-8B" "meta-llama/Meta-Llama-3-70B" "NousResearch/Llama-2-70b-hf" "NousResearch/Llama-2-7b-chat-hf" "Qwen/Qwen2-7B-Instruct" "Qwen/Qwen2-72B-Instruct" "Qwen/Qwen1.5-110B-Chat")
 
 ROOT_PATH=$(dirname $(dirname "$PWD"))"/"
 BENCHMARK_PATH=$ROOT_PATH"Ali_MI300_Tuned/Ali_PoC/throughput/benchmark_throughput_0802_1717.py"
@@ -16,6 +15,7 @@ echo $BENCHMARK_PATH
 OUTPUT_LEN=500
 NUM_SEQ=1000
 INPUT_LEN="1000 2000"
+export HF_HUB_CACHE="/workspace/PerfRes":"/root/.cache/huggingface/hub/":${HF_HUB_CACHE}
 
 for MODEL in ${MODELS[@]}; do
     if [[ $(echo "${MODEL}" | grep "110B") != "" ]]; then

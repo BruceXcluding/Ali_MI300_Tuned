@@ -1,0 +1,9 @@
+Validator,PT_VERSION,2.4.0
+Validator,ROCM_VERSION,6.1.0.0-82-5fabb4c
+Validator,HIPBLASLT_VERSION,0.7.0-1549b021
+Validator,GCN_ARCH_NAME,gfx942:sramecc+:xnack-
+Validator,ROCBLAS_VERSION,4.1.0-cefa4a9b-dirty
+GemmTunableOp_Half_TN,tn_4096_8000_2048,Gemm_Hipblaslt_TN_9753,0.22978
+GemmTunableOp_Half_TN,tn_64128_256_4096,Gemm_Rocblas_621286905,0.298768
+GemmTunableOp_Half_TN,tn_3072_8192_4096,Gemm_Rocblas_621294473,0.350987
+GemmTunableOp_Half_TN,tn_4096_232_7168,Gemm_Rocblas_621286491,0.0427891

@@ -8,8 +8,9 @@ for d in */; do
     cd $d
     for f in *.yaml; do
 	echo "Tuning for $d/$f"
-	HIP_VISIBLE_DEVICES=0,1,2,3 python $TUNE_PATH $f --cuda_device 0 1 2 3
+	python $TUNE_PATH $f --cuda_device 0 1 2 3
     done
     cd ..
 done
-python3 combine_csvs.py
+
+python3 combine_yamls.py
