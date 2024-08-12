@@ -2,11 +2,11 @@
 
 set -ex
 
-declare -a MODELS=("NousResearch/Llama-2-7b-chat-hf" "NousResearch/Llama-2-70b-hf" "NousResearch/Meta-Llama-3.1-8B" "NousResearch/Meta-Llama-3.1-70B" "Qwen/Qwen2-7B-Instruct" "Qwen/Qwen2-72B-Instruct" "Qwen/Qwen1.5-110B-Chat")
-# declare -a MODELS=("meta-llama/Meta-Llama-3-8B" "meta-llama/Meta-Llama-3-70B" "NousResearch/Llama-2-70b-hf" "NousResearch/Llama-2-7b-chat-hf" "Qwen/Qwen2-7B-Instruct" "Qwen/Qwen2-72B-Instruct" "Qwen/Qwen1.5-110B-Chat")
+# declare -a MODELS=("NousResearch/Llama-2-7b-chat-hf" "NousResearch/Llama-2-70b-hf" "NousResearch/Meta-Llama-3.1-8B" "NousResearch/Meta-Llama-3.1-70B" "Qwen/Qwen2-7B-Instruct" "Qwen/Qwen2-72B-Instruct" "Qwen/Qwen1.5-110B-Chat")
+declare -a MODELS=("meta-llama/Meta-Llama-3-8B" "meta-llama/Meta-Llama-3-70B" "NousResearch/Llama-2-70b-hf" "NousResearch/Llama-2-7b-chat-hf" "Qwen/Qwen2-7B-Instruct" "Qwen/Qwen2-72B-Instruct" "Qwen/Qwen1.5-110B-Chat")
 
 ROOT_PATH=$(dirname $(dirname "$PWD"))"/"
-BENCHMARK_PATH=$ROOT_PATH"Ali_MI300_Tuned/Ali_PoC/throughput/benchmark_throughput_0802_1717.py"
+BENCHMARK_PATH=$ROOT_PATH"Ali_MI300_Tuned/Ali_PoC/throughput/benchmark_throughput_cust_0613_043.py"
 # BENCHMARK_PATH=$ROOT_PATH"/vllm/benchmarks/benchmark_throughput.py"
 TEMP_FILE_PATH=$ROOT_PATH"PerfRes/"
 KIT_SOURCE_PATH=$ROOT_PATH"Ali_MI300_Tuned/pytorch_afo_testkit"
@@ -15,7 +15,7 @@ echo $BENCHMARK_PATH
 OUTPUT_LEN=500
 NUM_SEQ=1000
 INPUT_LEN="1000 2000"
-export HF_HUB_CACHE="/workspace/PerfRes":"/root/.cache/huggingface/hub/":${HF_HUB_CACHE}
+export HF_HUB_CACHE="/workspace/PerfRes"
 
 for MODEL in ${MODELS[@]}; do
     if [[ $(echo "${MODEL}" | grep "110B") != "" ]]; then
@@ -56,10 +56,10 @@ for MODEL in ${MODELS[@]}; do
         fi
         echo "[LOG] json name is ${JSON_NAME}"
 
-        if [ "$CURRTP" -eq 1 ]; then
-            RUN_SCRIPT="python $BENCHMARK_PATH --backend vllm --input-len ${inp} --output-len $OUTPUT_LEN --num-prompts $NUM_SEQ --model "${MODELS[${i}]}" --tokenizer "${MODELS[${i}]}" --dtype float16 --enforce-eager --quantization-param-path "$TEMP_FILE_PATH" --device cuda --download-dir "$TEMP_FILE_PATH" --output-json "$TEMP_FILE_PATH$CURRMODEL"/"$JSON_NAME
+        if [ $CURRTP -eq 1 ]; then
+            RUN_SCRIPT="python $BENCHMARK_PATH --backend vllm --input-len ${inp} --output-len $OUTPUT_LEN --num-prompts $NUM_SEQ --model "${MODELS[${i}]}" --tokenizer "${MODELS[${i}]}" --dtype float16 --device cuda --output-json "$TEMP_FILE_PATH$CURRMODEL"/"$JSON_NAME
         else
-            RUN_SCRIPT="torchrun --standalone --nnodes 1 --nproc-per-node $CURRTP $BENCHMARK_PATH --backend vllm --input-len ${inp} --output-len $OUTPUT_LEN --num-prompts $NUM_SEQ --model "${MODELS[${i}]}" --tokenizer "${MODELS[${i}]}" -tp "$CURRTP" --dtype float16 --enforce-eager --quantization-param-path "$TEMP_FILE_PATH" --device cuda --download-dir "$TEMP_FILE_PATH" --output-json "$TEMP_FILE_PATH$CURRMODEL"/"$JSON_NAME
+            RUN_SCRIPT="torchrun --standalone --nnodes 1 --nproc-per-node $CURRTP $BENCHMARK_PATH --backend vllm --input-len ${inp} --output-len $OUTPUT_LEN --num-prompts $NUM_SEQ --model "${MODELS[${i}]}" --tokenizer "${MODELS[${i}]}" -tp "$CURRTP" --dtype float16  --device cuda --output-json "$TEMP_FILE_PATH$CURRMODEL"/"$JSON_NAME
         fi
 
         cd $ROOT_PATH
@@ -120,9 +120,13 @@ for MODEL in ${MODELS[@]}; do
             cd $KIT_PATH
             YAML_NAME=$CURRMODEL"_"${inp}".yaml"
             echo "[LOG] yaml file: "$YAML_NAME
-            ROCBLAS_LAYER=4 $RUN_SCRIPT 2>&1 |  grep "\- { rocblas_function:" | uniq | tee $YAML_NAME        
-            
-            cp -r $YAML_NAME $GEMM_TUNE_PATH/$CURRMODEL-${inp}inp
+
+            if [[ $1 == "stop_yaml" ]]; then
+                $RUN_SCRIPT
+            else
+                ROCBLAS_LAYER=4 $RUN_SCRIPT 2>&1 |  grep "\- { rocblas_function:" | uniq | tee $YAML_NAME                    
+                cp -r $YAML_NAME $GEMM_TUNE_PATH/$CURRMODEL-${inp}inp
+            fi
         fi
         cd $ROOT_PATH
         rm -rf $ROOT_PATH$CURRMODEL/
